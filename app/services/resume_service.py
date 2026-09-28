@@ -1,4 +1,4 @@
-from schemas.resume import ResumeRequest
+from app.schemas.resume import ResumeRequest
 from services.pdf_service import PDFService
 
 
