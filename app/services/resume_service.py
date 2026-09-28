@@ -1,5 +1,5 @@
 from app.schemas.resume import ResumeRequest
-from services.pdf_service import PDFService
+from app.services.pdf_service import PDFService
 
 
 class ResumeService:
@@ -21,6 +21,14 @@ class ResumeService:
 
         # Convert Pydantic model into a normal Python dictionary
         resume_data = resume.model_dump(exclude_none=True)
+
+        contact = resume_data.get("contact", {})
+        resume_data["personal"] = {
+            "name": resume_data.get("full_name"),
+            "email": contact.get("email"),
+            "phone": contact.get("phone"),
+            "location": contact.get("location"),
+        }
 
         # Use the user's name for the generated filename
         personal = resume_data.get("personal", {})
@@ -50,4 +58,4 @@ class ResumeService:
 
         safe_name = safe_name.strip().replace(" ", "_")
 
-        return f"{safe_name or 'resume'}.pdf"
+        return f"{safe_name or 'resume'}_resume.pdf"

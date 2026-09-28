@@ -223,10 +223,15 @@ class PDFService:
         for item in education:
 
             degree = item.get("degree")
+            field_of_study = item.get("field_of_study")
             institution = item.get("institution")
 
+            program = self._join_non_empty(
+                [degree, field_of_study],
+                " in ",
+            )
             title = self._join_non_empty(
-                [degree, institution],
+                [program, institution],
                 " | ",
             )
 
@@ -251,13 +256,13 @@ class PDFService:
                     )
                 )
 
-            details = item.get("details")
+            grade = item.get("grade")
 
-            if details:
+            if grade:
                 story.append(
                     Paragraph(
-                        self._escape(str(details)),
-                        self.styles["normal"],
+                        self._escape(f"Grade: {grade}"),
+                        self.styles["small"],
                     )
                 )
 
@@ -478,10 +483,46 @@ class PDFService:
             "Achievements",
         )
 
-        self._add_bullet_list(
-            story,
-            achievements,
-        )
+        for achievement in achievements:
+
+            if isinstance(achievement, dict):
+                title = achievement.get("title") or achievement.get("text")
+                description = achievement.get("description")
+                date = achievement.get("date")
+
+                if title:
+                    story.append(
+                        Paragraph(
+                            self._escape(str(title)),
+                            self.styles["heading"],
+                        )
+                    )
+
+                if description:
+                    story.append(
+                        Paragraph(
+                            self._escape(str(description)),
+                            self.styles["normal"],
+                        )
+                    )
+
+                if date:
+                    story.append(
+                        Paragraph(
+                            self._escape(str(date)),
+                            self.styles["small"],
+                        )
+                    )
+
+            elif achievement:
+                story.append(
+                    Paragraph(
+                        f"• {self._escape(str(achievement))}",
+                        self.styles["normal"],
+                    )
+                )
+
+            story.append(Spacer(1, 3))
 
     # =========================================================
     # HELPERS
