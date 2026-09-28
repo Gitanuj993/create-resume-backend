@@ -1,9 +1,6 @@
 """
 API Gateway
 """
-from fastapi import FastAPI
-from app.routes.resume import router as resume_router
-
 app = FastAPI(title="Resume Generation Service",descrption="API for generating resume",version="1.0.0")
 
 # -------------------------
