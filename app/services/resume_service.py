@@ -1,42 +1,53 @@
-from pathlib import Path
-
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-
-from app.schemas.resume import ResumeRequest
+from schemas.resume import ResumeRequest
+from services.pdf_service import PDFService
 
 
-OUTPUT_DIR = Path("generated")
-OUTPUT_DIR.mkdir(exist_ok=True)
+class ResumeService:
 
+    def __init__(self):
+        self.pdf_service = PDFService()
 
-def generate_resume(data: ResumeRequest) -> Path:
+    def generate_resume(self, resume: ResumeRequest) -> str:
+        """
+        Generate a resume PDF from the validated nested resume data.
 
-    output_path = OUTPUT_DIR / "resume.pdf"
+        Args:
+            resume: Validated ResumeRequest containing the complete
+                    nested resume structure.
 
-    pdf = canvas.Canvas(
-        str(output_path),
-        pagesize=A4
-    )
+        Returns:
+            Path to the generated PDF file.
+        """
 
-    width, height = A4
+        # Convert Pydantic model into a normal Python dictionary
+        resume_data = resume.model_dump(exclude_none=True)
 
-    # Name
-    pdf.setFont("Helvetica-Bold", 20)
-    pdf.drawString(50, height - 60, data.name)
+        # Use the user's name for the generated filename
+        personal = resume_data.get("personal", {})
+        name = personal.get("name", "resume")
 
-    # Contact information
-    pdf.setFont("Helvetica", 10)
-    pdf.drawString(50, height - 85, data.email)
-    pdf.drawString(50, height - 100, data.phone)
+        filename = self._create_filename(name)
 
-    # Summary
-    pdf.setFont("Helvetica-Bold", 14)
-    pdf.drawString(50, height - 140, "Summary")
+        # Delegate PDF generation to PDFService
+        pdf_path = self.pdf_service.generate_resume(
+            resume_data=resume_data,
+            filename=filename,
+        )
 
-    pdf.setFont("Helvetica", 10)
-    pdf.drawString(50, height - 160, data.summary)
+        return pdf_path
 
-    pdf.save()
+    @staticmethod
+    def _create_filename(name: str) -> str:
+        """
+        Convert the candidate's name into a safe PDF filename.
+        """
 
-    return output_path
+        safe_name = "".join(
+            character
+            for character in name
+            if character.isalnum() or character in (" ", "_", "-")
+        )
+
+        safe_name = safe_name.strip().replace(" ", "_")
+
+        return f"{safe_name or 'resume'}.pdf"
