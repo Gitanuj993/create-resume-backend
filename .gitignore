@@ -20,3 +20,5 @@ dist/
 # IDE
 .vscode/
 .idea/
+
+generated_resumes/
