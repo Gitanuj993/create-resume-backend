@@ -14,8 +14,14 @@ Open `http://127.0.0.1:8000/docs` for the Swagger UI. The health endpoint is `GE
 
 
 
-
-
 ## Generate a resume
 
 Send a JSON `POST` request to `/resume/generate` matching the `ResumeRequest` schema shown in `/docs`. The endpoint responds with an `application/pdf` file.
+
+
+### Future Features
+- User is able to save their resumes.vDatabase introduced
+- Authentication will be introduce.
+- User can change existing pdf.
+- User can autofill their resume data via a chrome extensions.
+- you can automatically fill details to third party plateforms.
