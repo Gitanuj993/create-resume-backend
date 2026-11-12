@@ -45,26 +45,28 @@ class PDFService:
 
         story = []
 
-        sections = [
-            ("personal", self._add_personal_section),
-            ("summary", self._add_summary),
-            ("education", self._add_education),
-            ("experience", self._add_experience),
-            ("projects", self._add_projects),
-            ("skills", self._add_skills),
-            ("certifications", self._add_certifications),
-            ("achievements", self._add_achievements),
-        ]
-
-        for section_name, renderer in sections:
-
+        temp_sections =[section for section in resume_data.get("section_order",[]) ]
+        print(f"Temp Sections: {temp_sections}")
+        
+        sections = {
+    "personal": self._add_personal_section,
+    "summary": self._add_summary,
+    "education": self._add_education,
+    "experience": self._add_experience,
+    "projects": self._add_projects,
+    "skills": self._add_skills,
+    "certifications": self._add_certifications,
+    "achievements": self._add_achievements,
+}
+        #add personal section first 
+        self._add_personal_section(story, resume_data.get("personal", {}))
+        for section_name in temp_sections:
+            renderer = sections.get(section_name)
             data = resume_data.get(section_name)
-
             if data:
                 renderer(story, data)
 
-        document.build(story)
-
+        document.build(story)     
         return str(output_path)
 
     # =========================================================
