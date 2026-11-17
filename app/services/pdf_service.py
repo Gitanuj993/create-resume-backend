@@ -47,8 +47,6 @@ class PDFService:
         # Handle Dynamic Section orders recieved from client
         temp_sections =[section for section in resume_data.get("section_order",[]) ]
         print(f"Temp Sections: {temp_sections}")
-        # remove summary section from Temp Sections
-        temp_sections.remove("summary") # remove this section when client no longer send the "summary" sections.
         
         sections = {
     "personal": self._add_personal_section,
