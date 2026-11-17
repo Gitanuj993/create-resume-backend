@@ -44,9 +44,7 @@ class PDFService:
         )
 
         story = []
-
-        temp_sections =[section for section in resume_data.get("section_order",[]) ]
-        print(f"Temp Sections: {temp_sections}")
+        # Handle Dynamic Section orders recieved from client
         
         sections = {
     "personal": self._add_personal_section,
@@ -58,9 +56,10 @@ class PDFService:
     "certifications": self._add_certifications,
     "achievements": self._add_achievements,
 }
-        #add personal section first 
+        # Personal and summary section remain fixed
         self._add_personal_section(story, resume_data.get("personal", {}))
-        for section_name in temp_sections:
+        self._add_summary(story,resume_data.get("summary",{}))
+        for section_name in resume_data.get("section_order",[]):
             renderer = sections.get(section_name)
             data = resume_data.get(section_name)
             if data:
